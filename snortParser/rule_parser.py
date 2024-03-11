@@ -29,7 +29,7 @@ class SnortRuleParser:
         self.proto_type = None       
         self.Xeger = Xeger(limit=10)
         
-    #½âÎöcontent±êÇ©
+    #è§£æcontentæ ‡ç­¾
     def parse_content_string(self,content_string:str)->bytearray:
         message = bytearray()
         binary_region = False
@@ -59,11 +59,11 @@ class SnortRuleParser:
         return message  
     
     '''
-    src_bytes:´ıĞ´ÈëµÄÊı¾İ
-    dst_bytes:ÏÖÓĞÊı¾İÌåÄÚÈİ
+    src_bytes:å¾…å†™å…¥çš„æ•°æ®
+    dst_bytes:ç°æœ‰æ•°æ®ä½“å†…å®¹
     '''
     def cover_pcap(self,src_bytes,dst_bytes):
-        #Ã»ÓĞÎ»ÖÃ±êÇ©ÏŞÖÆÊ±,Ä¬ÈÏĞ´ÔÚÇ°Ò»¸öÄ£Ê½´®ºóÃæ
+        #æ²¡æœ‰ä½ç½®æ ‡ç­¾é™åˆ¶æ—¶,é»˜è®¤å†™åœ¨å‰ä¸€ä¸ªæ¨¡å¼ä¸²åé¢
         if self.index_beg == 0:
             self.index_beg = len(dst_bytes) 
             
@@ -78,16 +78,16 @@ class SnortRuleParser:
         
         return dst_bytes
 
-    #±£´æÇ°Ò»¸ö¶Î½âÎöµÄÊı¾İ
+    #ä¿å­˜å‰ä¸€ä¸ªæ®µè§£æçš„æ•°æ®
     def cover_pcap_wrapper(self,src_bytes):
-        #·ÇHTTPĞ­Òé
+        #éHTTPåè®®
         if self.location_type == None and self.proto_type != "HTTP":
             if self.proto_type == "TCP":
                 self.tcp_payload = self.cover_pcap(src_bytes,self.tcp_payload)
             else:
                 self.udp_payload = self.cover_pcap(src_bytes,self.udp_payload)
         
-        #HTTPĞ­Òé
+        #HTTPåè®®
         elif self.location_type == "http_status":
             self.http_status = src_bytes
         elif self.location_type == "http_method":
@@ -99,21 +99,22 @@ class SnortRuleParser:
                 self.http_header.append([bytearray(generate_random_str(6),encoding="utf-8"),src_bytes])
             else:
                 self.http_header.append(src_bytes.split(b":",1))
-        #È±Ê¡´¦Àí
+        #ç¼ºçœå¤„ç†
         elif self.location_type == "http_body" or self.location_type == None:
             self.http_body = self.cover_pcap(src_bytes,self.http_body)
         else:
-            print("Î´ÖªÎ»ÖÃ²ÎÊı\n")
+            print("æœªçŸ¥ä½ç½®å‚æ•°\n")
         self.location_type = None
         self.pcap_segment = None
     
-    #È·¶¨Ğ­ÒéÀàĞÍ£¬³õÊ¼»¯Ïà¹Ø±äÁ¿
+    #ç¡®å®šåè®®ç±»å‹ï¼Œåˆå§‹åŒ–ç›¸å…³å˜é‡
     def init_snort_parser(self):
         self.body_min = 0
         self.body_max = 0
         
         self.sid = None
-        self.parent_sid = None
+        self.set_sid = None
+        self.isset_sid = None
         
         if self.snort_rule.proto.lower() == "udp":
             self.proto_type = "UDP"
@@ -129,11 +130,11 @@ class SnortRuleParser:
             self.proto_type = "TCP"
             self.tcp_payload = bytearray()
         else:
-            print("Î´ÖªĞ­ÒéÀàĞÍ\n")
+            print("æœªçŸ¥åè®®ç±»å‹\n")
             return False
         return True
              
-    #ÌáÈ¡Snort¹æÔòĞÅÏ¢
+    #æå–Snortè§„åˆ™ä¿¡æ¯
     def snort_parser(self) -> dict:
         if self.init_snort_parser() == False:
             return None
@@ -143,34 +144,34 @@ class SnortRuleParser:
                 option_name = option["name"]
                 option_value = option["value"]
             
-                #È¥³ı¸ÉÈÅ×Ö·û"
+                #å»é™¤å¹²æ‰°å­—ç¬¦"
                 if option_value != None:
                     option_value = option_value.strip("\"")
                 
-                #content±êÇ©±íÊ¾Ò»¸öcontent¶ÎµÄ¿ªÊ¼ºÍÇ°Ò»¸öcontent¶Î½áÊø
+                #contentæ ‡ç­¾è¡¨ç¤ºä¸€ä¸ªcontentæ®µçš„å¼€å§‹å’Œå‰ä¸€ä¸ªcontentæ®µç»“æŸ
                 if option_name == "content":
                     if self.pcap_segment != None:
                         self.cover_pcap_wrapper(self.pcap_segment)
                     self.pcap_segment = self.parse_content_string(option_value)
                     
-                #pcre±êÇ©±íÊ¾Ò»¸ö¶ÎµÄ¿ªÊ¼ºÍÇ°Ò»¸öpcre¶Î½áÊø
+                #pcreæ ‡ç­¾è¡¨ç¤ºä¸€ä¸ªæ®µçš„å¼€å§‹å’Œå‰ä¸€ä¸ªpcreæ®µç»“æŸ
                 elif option_name == "pcre":
                     if self.pcap_segment != None:
                         self.cover_pcap_wrapper(self.pcap_segment)
                     option_value = re.match("/(.+)/",option_value)
                     if option_value == None:
-                        print("pcre±êÇ©½âÎö´íÎó\n")
+                        print("pcreæ ‡ç­¾è§£æé”™è¯¯\n")
                         return None
                     self.pcap_segment = bytearray(self.Xeger.xeger(option_value.group(1)),encoding="utf-8")
                 
-                #ÒÔsid±êÇ©´ú±íÕâ×îºóÒ»¸ö¶Î½áÊø
+                #ä»¥sidæ ‡ç­¾ä»£è¡¨è¿™æœ€åä¸€ä¸ªæ®µç»“æŸ
                 elif option_name == "sid":
                     self.sid = option_value
                     if self.pcap_segment != None:
                         self.cover_pcap_wrapper(self.pcap_segment)
                         
             
-                #´¦ÀíÍ¨ÓÃcontentÎ»ÖÃĞŞÊÎ·û
+                #å¤„ç†é€šç”¨contentä½ç½®ä¿®é¥°ç¬¦
                 elif option_name.lower() == "offset":
                     self.index_beg = int(option_value)
                 elif option_name.lower() == "depth":
@@ -180,7 +181,7 @@ class SnortRuleParser:
                 elif option_name.lower() == "within":
                     self.index_end = self.pre_location + int(option_value)    
             
-                #½âÎöÊı¾İ¶Î´óĞ¡
+                #è§£ææ•°æ®æ®µå¤§å°
                 elif option_name.lower() == "dsize":
                     if option_value.find("<>") != -1 :
                         self.body_min,self.body_max = option_value.split("<>")
@@ -195,7 +196,7 @@ class SnortRuleParser:
                     else:
                         self.body_max = self.body_min = int(option_value)
                 
-                #´¦ÀíhttpĞ­ÒéÏà¹ØµÄcontentĞŞÊÎ·û
+                #å¤„ç†httpåè®®ç›¸å…³çš„contentä¿®é¥°ç¬¦
                 elif option_name.lower() == "http_method":
                     self.location_type = "http_method"
                 elif option_name.lower() == "http_only_uri":
@@ -207,86 +208,93 @@ class SnortRuleParser:
                 elif option_name.lower() == "http_stat_code":
                     self.location_type = "http_status"
 
-                #½âÎöÁ÷·½Ïò
+                #è§£ææµæ–¹å‘
                 elif option_name.lower() == "flow":
                     if option_value == "to_server,established":
                         self.flow_direct = "->"
                     else:
                         self.flow_direct = "<-"
                 
-                #½âÎö¹æÔòÁ÷
+                #è§£æè§„åˆ™æµ
                 elif option_name.lower() == "flowbits":
-                    if option_value.startswith("set") or option_value.startswith("isset"):
+                    if option_value.startswith("set"):
                         action,psid = option_value.split(",")
-                        self.parent_psid = psid.rsplit("_",1)[1]
+                        self.set_sid = psid.rsplit("_",1)[1]
+                        
+                    elif option_value.startswith("isset"):
+                        action,psid = option_value.split(",")
+                        self.isset_sid = psid.rsplit("_",1)[1]
                 
-                #Ìø¹ıÎŞĞè´¦ÀíµÄcontentĞŞÊÎ·û
+                #è·³è¿‡æ— éœ€å¤„ç†çš„contentä¿®é¥°ç¬¦
                 elif option_name in ["nocase","msg","holetype-id","ruletype","rev"]:
                     continue
             
-                #Î´ÖªcontentĞŞÊÎ·û
+                #æœªçŸ¥contentä¿®é¥°ç¬¦
                 else:
-                    print("²»Ö§³ÖµÄsnort±êÇ©:{}\n".format(option_name))
+                    print("ä¸æ”¯æŒçš„snortæ ‡ç­¾:{}\n".format(option_name))
                     return None
                 
         except Exception as error:
-            print("½âÎöÊ§°Ü ´íÎóĞÅÏ¢:{}\n".format(str(error)))
+            print("è§£æå¤±è´¥ é”™è¯¯ä¿¡æ¯:{}\n".format(str(error)))
             return None
 
         if self.proto_type == "HTTP":
-            return {"parent_sid":self.parent_sid,"sid":self.sid,"proto_type":self.proto_type,"flow_direct":self.flow_direct,"paylod_size":{"body_min":self.body_min,"body_max":self.body_max},"payload_info":{"http_status":self.http_status,"http_method":self.http_method,"http_uri":self.http_uri,"http_header":self.http_header,"http_body":self.http_body}}
+            return {"set_sid":self.set_sid,"isset_sid":self.isset_sid,"sid":self.sid,"proto_type":self.proto_type,"flow_direct":self.flow_direct,"paylod_size":{"body_min":self.body_min,"body_max":self.body_max},"payload_info":{"http_status":self.http_status,"http_method":self.http_method,"http_uri":self.http_uri,"http_header":self.http_header,"http_body":self.http_body}}
         elif self.proto_type == "TCP":
-            return {"parent_sid":self.parent_sid,"sid":self.sid,"proto_type":self.proto_type,"flow_direct":self.flow_direct,"paylod_size":{"body_min":self.body_min,"body_max":self.body_max},"payload_info":{"tcp_payload":self.tcp_payload}}
+            return {"set_sid":self.set_sid,"isset_sid":self.isset_sid,"sid":self.sid,"proto_type":self.proto_type,"flow_direct":self.flow_direct,"paylod_size":{"body_min":self.body_min,"body_max":self.body_max},"payload_info":{"tcp_payload":self.tcp_payload}}
         else:
-            return {"parent_sid":self.parent_sid,"sid":self.sid,"proto_type":self.proto_type,"flow_direct":self.flow_direct,"paylod_size":{"body_min":self.body_min,"body_max":self.body_max},"payload_info":{"udp_payload":self.udp_payload}}
+            return {"set_sid":self.set_sid,"isset_sid":self.isset_sid,"sid":self.sid,"proto_type":self.proto_type,"flow_direct":self.flow_direct,"paylod_size":{"body_min":self.body_min,"body_max":self.body_max},"payload_info":{"udp_payload":self.udp_payload}}
 
   
 
 def parse_snort_rule_file(file_name:str,save_path:str)->list:
-    #´æ´¢Á÷Ê½¹æÔò¹¹½¨°üÏà¹ØĞÅÏ¢
+    #å­˜å‚¨æµå¼è§„åˆ™æ„å»ºåŒ…ç›¸å…³ä¿¡æ¯
     rule_links = dict()    
-    #´æ´¢Á÷Ê½¹æÔòµÄ¸ù¹æÔòSID
+    #å­˜å‚¨æµå¼è§„åˆ™çš„æ ¹è§„åˆ™SID
     rule_root = dict()
 
     rule_list = rule.parse_file(file_name)
     for snort_rule in rule_list:
-        #½âÎö¹æÔò£¬»ñÈ¡¹¹½¨Êı¾İ°üÔØºÉËùĞèµÄ²ÎÊı
+        #è§£æè§„åˆ™ï¼Œè·å–æ„å»ºæ•°æ®åŒ…è½½è·æ‰€éœ€çš„å‚æ•°
         payload_param = SnortRuleParser(snort_rule).snort_parser()
         
         if payload_param == None:
-            print("¹æÔò½âÎöÊ§°Ü ¹æÔòÄÚÈİ:{}\n".format(snort_rule.raw))
+            print("è§„åˆ™è§£æå¤±è´¥ è§„åˆ™å†…å®¹:{}\n".format(snort_rule.raw))
             continue
         
         sid =  payload_param["sid"]     
-        psid = payload_param["parent_sid"]
-        #ÅĞ¶ÏÊÇ·ñÉèÖÃÁËflowbits±ê¼Ç£¬Ã»ÓĞÔòÖ±½Ó³¢ÊÔ¹¹½¨Êı¾İ°ü
-        if psid != None :
-            #set±êÖ¾
-            if psid == sid:
-                rule_root[sid] = psid
-                rule_links[sid] = list()
-                rule_links[sid].append(payload_param)
-            #isset±êÖ¾
+        set_sid = payload_param["set_sid"]
+        isset_sid = payload_param["isset_sid"]
+        
+        #åˆ¤æ–­æ˜¯å¦è®¾ç½®äº†flowbitsæ ‡è®°ï¼Œæ²¡æœ‰åˆ™ç›´æ¥å°è¯•æ„å»ºæ•°æ®åŒ…
+
+        #setæ ‡å¿—
+        if isset_sid == None and set_sid != None:
+            rule_root[set_sid] = set_sid
+            rule_links[set_sid] = list()
+            rule_links[set_sid].append(payload_param)
+        #issetæ ‡å¿—
+        elif isset_sid != None:
+            #æ£€æµ‹å‰æ²¿è§„åˆ™è§„åˆ™è§£ææ˜¯å¦æˆåŠŸ
+            if rule_root.get(isset_sid,None) != None:
+                rule_root[sid] = rule_root[isset_sid]
+                rule_links[rule_root[sid]].append(payload_param)
             else:
-                #¼ì²âÇ°ÑØ¹æÔò¹æÔò½âÎöÊÇ·ñ³É¹¦
-                if rule_root.get(psid,None) != None:
-                    rule_root[sid] = rule_root[psid]
-                    rule_links[rule_root[sid]].append(payload_param)
-                else:
-                    print("¹æÔòÁ´´æÔÚÈ±Ê§ È±Ê§½ÚµãSID:{}\n".format(psid))
+                print("è§„åˆ™é“¾å­˜åœ¨ç¼ºå¤± ç¼ºå¤±èŠ‚ç‚¹SID:{}\n".format(isset_sid))
         else:
-            print("¿ªÊ¼¹¹½¨°ü SID:{}".format(payload_param["sid"]))
+            print("å¼€å§‹æ„å»ºåŒ… SID:{}".format(payload_param["sid"]))
             pcap_builder(os.path.join(save_path,payload_param["sid"]+".pcap"),payload_param)
 
-    #Á÷Ê½¹æÔòµÄÊı¾İ°ü¹¹½¨ÑÓ³Ùµ½×îºó
+    #æµå¼è§„åˆ™çš„æ•°æ®åŒ…æ„å»ºå»¶è¿Ÿåˆ°æœ€å
     for root_sid,payload_param_list in rule_links.items():
+        name = str(max([int(sid) for sid,psid in rule_root.items() if psid==root_sid])) + ".pcap"
         if len(payload_param_list) == 1:
-            print("Á÷Ê½¹æÔò¹æÔòÁ´È±Ê§ SID:{}".format(root_sid))
+            print("æµå¼è§„åˆ™è§„åˆ™é“¾ç¼ºå¤± SID:{}".format(root_sid))
             continue
-        print("¿ªÊ¼¹¹½¨Á÷Ê½°ü SID:{}".format(root_sid))
-        multi_pcap_builder(os.path.join(save_path,root_sid+".pcap"),payload_param_list)
+        print("å¼€å§‹æ„å»ºæµå¼åŒ… SID:{}".format(root_sid))
+        multi_pcap_builder(os.path.join(save_path,name),payload_param_list)
 
-rule_file_path = "D:\\QYWX\\WXWork\\1688856330430650\\Cache\\File\\2024-01\\Test.rules"
-save_path = "D:\\QYWX\\WXWork\\1688856330430650\\Cache\\File\\2024-03\\PythonApplication1\\pcap"
+rule_file_path = ""
+save_path = ""
 
 parse_snort_rule_file(rule_file_path,save_path)
