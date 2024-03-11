@@ -2,7 +2,7 @@
 
 from StreamBuilder import *
 
-#¸ù¾İ¸ø¶¨µÄHTTP²ÎÊı£¬¹¹½¨TCPĞ­ÒéÖĞµÄHTTPÔØºÉ£¬ÔÙµ÷ÓÃTcpStreamBuilder½¨°ü
+#æ ¹æ®ç»™å®šçš„HTTPå‚æ•°ï¼Œæ„å»ºTCPåè®®ä¸­çš„HTTPè½½è·ï¼Œå†è°ƒç”¨TcpStreamBuilderå»ºåŒ…
 class HttpPcapBuilder():
     status_map_table = {
     "200":b"OK",
@@ -30,7 +30,7 @@ class HttpPcapBuilder():
         
         self.pcap_builder_client = TcpStreamBuilder(client_ip,client_port,client_mac,server_ip,server_port,server_mac,tcp_init_seq)
 
-    #¹¹½¨ÇëÇóÍ·
+    #æ„å»ºè¯·æ±‚å¤´
     def HttpRequestHeaderBuilder(self,http_method:bytearray,http_uri:bytearray,http_header:list)-> bytearray:
         http_request_header = http_method + b" " + http_uri + b" " + b"HTTP/1.1\r\n"
         for key,value in http_header:
@@ -38,7 +38,7 @@ class HttpPcapBuilder():
         http_request_header += b"\r\n"
         return http_request_header
         
-    #¹¹½¨ÏìÓ¦Í·
+    #æ„å»ºå“åº”å¤´
     def HttpRespondHeaderBuilder(self,status:bytearray,http_header:list)-> bytearray:
         http_respond_header = b"HTTP/1.1" + b" " + status + b" " + HttpPcapBuilder.GetHttpStatusDesc(str(status,encoding="utf-8"))
         for key,value in http_header:
@@ -48,7 +48,7 @@ class HttpPcapBuilder():
     
     '''
 
-    payload_param   ÓÉrule_parseÄ£¿ésnort_parserº¯Êı·µ»Ø
+    payload_param   ç”±rule_parseæ¨¡å—snort_parserå‡½æ•°è¿”å›
     {
         "proto_type":self.proto_type
         "flow_direct":self.flow_direct
@@ -68,7 +68,7 @@ class HttpPcapBuilder():
     }
     '''
     
-    #Í¨¹ı¸ø¶¨²ÎÊı¹¹½¨HTTPÇëÇóÊı¾İ
+    #é€šè¿‡ç»™å®šå‚æ•°æ„å»ºHTTPè¯·æ±‚æ•°æ®
     def parse_http_respond_payload_param(self,payload_param:dict):
         data = self.default_recv_payload if len(payload_param["payload_info"]["http_body"]) == 0 else payload_param["payload_info"]["http_body"] 
         http_status = payload_param["payload_info"]["http_status"] if len(payload_param["payload_info"]["http_status"]) != 0 else self.default_http_status
@@ -76,7 +76,7 @@ class HttpPcapBuilder():
         return self.HttpRespondHeaderBuilder(http_status,http_header) + data
         
     
-    #Í¨¹ı¸ø¶¨²ÎÊı¹¹½¨HTTP·µ»ØÊı¾İ
+    #é€šè¿‡ç»™å®šå‚æ•°æ„å»ºHTTPè¿”å›æ•°æ®
     def parse_http_request_payload_param(self,payload_param:dict):
         data = bytearray()
         http_uri =self.default_http_uri if len(payload_param["payload_info"]["http_uri"]) == 0 else payload_param["payload_info"]["http_uri"]
@@ -85,7 +85,7 @@ class HttpPcapBuilder():
             
         http_method = self.default_http_method if len(payload_param["payload_info"]["http_method"]) == 0 else payload_param["payload_info"]["http_method"]
         http_header = payload_param["payload_info"]["http_header"] if len(payload_param["payload_info"]["http_header"]) != 0 else self.default_http_request_header
-        if payload_param["payload_info"]["http_method"] == b"POST":
+        if payload_param["payload_info"]["http_method"] == b"POST" or len(payload_param["payload_info"]["http_body"]) != 0:
             data = self.default_send_payload if len(payload_param["payload_info"]["http_body"]) == 0 else payload_param["payload_info"]["http_body"] 
         
         return self.HttpRequestHeaderBuilder(http_method,http_uri,http_header) + data
@@ -96,7 +96,7 @@ class HttpPcapBuilder():
             http_data = self.parse_http_request_payload_param(payload_param)
         else:
             http_data = self.parse_http_respond_payload_param(payload_param)
-        #Êı¾İ°ü´óĞ¡¼ì²é
+        #æ•°æ®åŒ…å¤§å°æ£€æŸ¥
 
         dsize_min = payload_param["paylod_size"]["body_min"]
         dsize_max = payload_param["paylod_size"]["body_max"]
@@ -107,7 +107,7 @@ class HttpPcapBuilder():
                 http_data += bytearray(dsize_min - cur_size)
         if dsize_max != 0 :
             if cur_size > dsize_max:
-                print("Êı¾İ°ü´óĞ¡²ÎÊıÓĞÎó")
+                print("æ•°æ®åŒ…å¤§å°å‚æ•°æœ‰è¯¯")
                 http_data = None
             
         return http_data
@@ -154,7 +154,7 @@ class TcpPcapBuilder:
                 payload += bytearray(dsize_min - cur_size)
         if dsize_max != 0 :
             if cur_size > dsize_max:
-                print("Êı¾İ°ü´óĞ¡²ÎÊıÓĞÎó")
+                print("æ•°æ®åŒ…å¤§å°å‚æ•°æœ‰è¯¯")
                 payload = None
                 
         return payload
@@ -182,9 +182,9 @@ class TcpPcapBuilder:
                 return False
 
             if payload_param["flow_direct"] == "->":
-                self.pcap_builder_client.pcap_builder(payload,self.default_recv_payload)
+                self.pcap_builder_client.pcap_builder(payload,self.default_recv_payload,False)
             else:
-                self.pcap_builder_client.pcap_builder(self.default_send_payload,payload)
+                self.pcap_builder_client.pcap_builder(self.default_send_payload,payload,False)
         
         self.pcap_builder_client.pcap_writer(file_name)
         return True 
@@ -206,7 +206,7 @@ class UdpPcapBuilder:
                 payload += bytearray(dsize_min - cur_size)
         if dsize_max != 0 :
             if cur_size > dsize_max:
-                print("Êı¾İ°ü´óĞ¡²ÎÊıÓĞÎó")
+                print("æ•°æ®åŒ…å¤§å°å‚æ•°æœ‰è¯¯")
                 payload = None
                 
         return payload
