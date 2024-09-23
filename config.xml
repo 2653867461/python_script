@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <config>
+        <urls_file></urls_file>                     <!-- 保存URLS的文间路径，默认为空-->
+        
+        <webdriber>
+            <webdriber_type></webdriber_type>
+            <screenshot_path></screenshot_path>
+            <download_path></download_path>
+            <webdirver_path></webdirver_path>
+        </webdriber>
+
+        <rule_container type="">
+            <rule name="" keyboard="信任地址，安全下载" engine_name="bing" faster="">
+                <filter_rule_set>
+                    <filter_rule>
+                        <filter_type>title</filter_type>         <!-- 过滤点:title/link/summary-->
+                        <content>信任地址，安全下载</content>                 <!-- 比较内容-->
+                    </filter_rule>
+                </filter_rule_set>
+                
+                <rule_set relationship="AND">              <!-- 规则集 可嵌套 relationship可为OR，AND-->
+                    <rule_unit>                         <!-- 最小规则单元-->
+                        <location>title</location>           <!-- CSS选择器-->
+                        <content>信任地址，安全下载</content>             <!-- 比较内容-->
+                    </rule_unit>
+                    <rule_unit>                         <!-- 最小规则单元-->
+                        <location>.btn</location>           <!-- CSS选择器-->
+                        <content>点击这里下载</content>             <!-- 比较内容-->
+                    </rule_unit>
+                </rule_set>
+            </rule>
+        </rule_container>
+
+    </config>
