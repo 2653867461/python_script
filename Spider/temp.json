@@ -1,0 +1,109 @@
+'{
+    "ip": 1152903752,
+    "port": 22,
+    "transport": "tcp",
+    "version": "7.6p1 Ubuntu 4ubuntu0.5",
+    "cloud": {
+        "region": "sg-05",
+        "service": null,
+        "provider": "DigitalOcean"
+    },
+    "location": {
+        "city": "Singapore",
+        "region_code": "01",
+        "area_code": null,
+        "longitude": 103.6957,
+        "latitude": 1.3215,
+        "country_code": "SG",
+        "country_name": "Singapore"
+    },
+    "product": "OpenSSH",
+    "hash": 435635796,
+    "tags": [
+        "cloud"
+    ],
+    "timestamp": "2024-10-05T07:44:59.190868",
+    "hostnames": [],
+    "ssh": {
+        "hassh": "b12d2871a1189eff20364cf5333619ee",
+        "fingerprint": "d8:a4:9d:a7:01:0c:1f:c0:6c:eb:f5:19:21:5d:13:61",
+        "mac": "hmac-sha2-256",
+        "cipher": "aes128-ctr",
+        "key": "AAAAB3NzaC1yc2EAAAADAQABAAABAQDPGRuFhzS5TLjz6Fb9zHgqy4jhLguIlhutK9nhKEGBfv4m\\nJXf0eFPZiMRnu9iGA2bk5Vajg6QRThyzoWFGoucGLQR01fBrilVFZMN731kNrw5jKlMrEyNBX+jS\\nvxZx8C+ovR38psXznpsY0W8+Q6EmYVFfGk42X3nfjKr7U4gGzWDV9IdOYQp53Am2vpcQTVQ3H0Qc\\nm5AfFSLmelg/eMhHdYEOnC/V1aG43jeXYLOIu4WavAU/Zaz4AjBe+G5gZtBG8fDuKiCtfWGWNWNH\\n3jxtem6r1V9GxEjcw8E7/m2E5JVzZDPmTHg8NAIn8H5aePMrS9p5F30nSLujEJz++NS9\\n",
+        "kex": {
+            "languages": [
+                ""
+            ],
+            "server_host_key_algorithms": [
+                "ssh-rsa",
+                "rsa-sha2-512",
+                "rsa-sha2-256",
+                "ecdsa-sha2-nistp256",
+                "ssh-ed25519"
+            ],
+            "encryption_algorithms": [
+                "chacha20-poly1305@openssh.com",
+                "aes128-ctr",
+                "aes192-ctr",
+                "aes256-ctr",
+                "aes128-gcm@openssh.com",
+                "aes256-gcm@openssh.com"
+            ],
+            "kex_follows": false,
+            "unused": 0,
+            "kex_algorithms": [
+                "curve25519-sha256",
+                "curve25519-sha256@libssh.org",
+                "ecdh-sha2-nistp256",
+                "ecdh-sha2-nistp384",
+                "ecdh-sha2-nistp521",
+                "diffie-hellman-group-exchange-sha256",
+                "diffie-hellman-group16-sha512",
+                "diffie-hellman-group18-sha512",
+                "diffie-hellman-group14-sha256",
+                "diffie-hellman-group14-sha1"
+            ],
+            "compression_algorithms": [
+                "none",
+                "zlib@openssh.com"
+            ],
+            "mac_algorithms": [
+                "umac-64-etm@openssh.com",
+                "umac-128-etm@openssh.com",
+                "hmac-sha2-256-etm@openssh.com",
+                "hmac-sha2-512-etm@openssh.com",
+                "hmac-sha1-etm@openssh.com",
+                "umac-64@openssh.com",
+                "umac-128@openssh.com",
+                "hmac-sha2-256",
+                "hmac-sha2-512",
+                "hmac-sha1"
+            ]
+        },
+        "type": "ssh-rsa"
+    },
+    "org": "DigitalOcean, LLC",
+    "data": "SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.5\\nKey type: ssh-rsa\\nKey: AAAAB3NzaC1yc2EAAAADAQABAAABAQDPGRuFhzS5TLjz6Fb9zHgqy4jhLguIlhutK9nhKEGBfv4m\\nJXf0eFPZiMRnu9iGA2bk5Vajg6QRThyzoWFGoucGLQR01fBrilVFZMN731kNrw5jKlMrEyNBX+jS\\nvxZx8C+ovR38psXznpsY0W8+Q6EmYVFfGk42X3nfjKr7U4gGzWDV9IdOYQp53Am2vpcQTVQ3H0Qc\\nm5AfFSLmelg/eMhHdYEOnC/V1aG43jeXYLOIu4WavAU/Zaz4AjBe+G5gZtBG8fDuKiCtfWGWNWNH\\n3jxtem6r1V9GxEjcw8E7/m2E5JVzZDPmTHg8NAIn8H5aePMrS9p5F30nSLujEJz++NS9\\nFingerprint: d8:a4:9d:a7:01:0c:1f:c0:6c:eb:f5:19:21:5d:13:61\\n\\nKex Algorithms:\\n\\tcurve25519-sha256\\n\\tcurve25519-sha256@libssh.org\\n\\tecdh-sha2-nistp256\\n\\tecdh-sha2-nistp384\\n\\tecdh-sha2-nistp521\\n\\tdiffie-hellman-group-exchange-sha256\\n\\tdiffie-hellman-group16-sha512\\n\\tdiffie-hellman-group18-sha512\\n\\tdiffie-hellman-group14-sha256\\n\\tdiffie-hellman-group14-sha1\\n\\nServer Host Key Algorithms:\\n\\tssh-rsa\\n\\trsa-sha2-512\\n\\trsa-sha2-256\\n\\tecdsa-sha2-nistp256\\n\\tssh-ed25519\\n\\nEncryption Algorithms:\\n\\tchacha20-poly1305@openssh.com\\n\\taes128-ctr\\n\\taes192-ctr\\n\\taes256-ctr\\n\\taes128-gcm@openssh.com\\n\\taes256-gcm@openssh.com\\n\\nMAC Algorithms:\\n\\tumac-64-etm@openssh.com\\n\\tumac-128-etm@openssh.com\\n\\thmac-sha2-256-etm@openssh.com\\n\\thmac-sha2-512-etm@openssh.com\\n\\thmac-sha1-etm@openssh.com\\n\\tumac-64@openssh.com\\n\\tumac-128@openssh.com\\n\\thmac-sha2-256\\n\\thmac-sha2-512\\n\\thmac-sha1\\n\\nCompression Algorithms:\\n\\tnone\\n\\tzlib@openssh.com\\n",
+    "asn": "AS14061",
+    "cpe23": [
+        "cpe:2.3:a:openbsd:openssh:7.6p1",
+        "cpe:2.3:o:canonical:ubuntu_linux"
+    ],
+    "info": "protocol 2.0",
+    "isp": "DigitalOcean, LLC",
+    "cpe": [
+        "cpe:/a:openbsd:openssh:7.6p1",
+        "cpe:/o:canonical:ubuntu_linux"
+    ],
+    "domains": [],
+    "ip_str": "68.183.234.72",
+    "os": "Ubuntu",
+    "_shodan": {
+        "region": "",
+        "ptr": true,
+        "module": "ssh",
+        "id": "5633d5a3-0aa9-4c37-8504-f676856dedfb",
+        "options": {},
+        "crawler": "91597136eb9b132d7cc954511e0d9cbe7ce2e377"
+    }
+}'
